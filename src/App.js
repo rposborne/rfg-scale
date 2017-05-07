@@ -36,6 +36,7 @@ class App extends Component {
         navigator.usb.requestDevice({ filters: this.USB_FILTERS })
           .then(device => this.bindDevice(device))
           .catch(error => {
+            console.error(error)
             this.setState({ connected: false, device: null })
           });
       }
