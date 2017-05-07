@@ -9,11 +9,11 @@ class App extends Component {
 
     this.state = {
       connected: false,
-      device: null
+      device: null,
+      grams: 0
     }
+
     if (navigator.usb) {
-
-
       navigator.usb.getDevices()
         .then((devices) => {
           devices.forEach(device => {
@@ -26,37 +26,42 @@ class App extends Component {
         this.bindDevice(e.device)
       });
 
-      navigator.usb.addEventListener('disconnect', device => {
-        console.log('device lost', device);
+      navigator.usb.addEventListener('disconnect', e => {
+        console.log('device lost', e);
+        e.device.close()
         this.setState({ connected: false, device: null })
       });
 
       this.connect = () => {
         navigator.usb.requestDevice({ filters: [{ vendorId: 0x0922, productId: 0x8003 }] })
           .then(device => this.bindDevice(device))
-          .catch(error => { this.setState({ connected: false, device: null }) });
-      }
-
-      this.getWeight = () => {
-        const { device } = this.state;
-
-        device.open((a, b, c) => {
-          console.log('a,b,c', a, b, c);
-        })
+          .catch(error => {
+            this.setState({ connected: false, device: null })
+          });
       }
     }
 
-    this.bindDevice.bind(this);
+    this.getWeight = this.getWeight.bind(this);
+    this.bindDevice = this.bindDevice.bind(this);
+  }
+
+  getWeight() {
+    const { device } = this.state;
+    let readLoop = () => {
+      device.transferIn(2, 8).then(result => {
+        let data = new Uint8Array(result.data.buffer)
+        let grams = data[4] + (256 * data[5])
+        this.setState({ grams: grams })
+        readLoop();
+      });
+    }
+    readLoop();
   }
 
   bindDevice(device) {
-    console.log(device.productName);
-    console.log(device.manufacturerName);
-    console.log('device', device);
-    window.device = device;
     device.open()
       .then(() => {
-        console.log('opened', device);
+        console.log(`Connected ${device.productName} ${device.manufacturerName}`);
         this.setState({ connected: true, device: device })
 
         if (device.configuration === null) {
@@ -64,30 +69,26 @@ class App extends Component {
         }
       })
       .then(() => device.claimInterface(0))
-      .then(() => device.controlTransferOut({
-        'requestType': 'class',
-        'recipient': 'interface',
-        'request': 0x22,
-        'value': 0x01,
-        'index': 0x02
-      }))
-      .catch((e) => {
-        console.log('e', e)
+      .catch((err) => {
+        console.error('USB Error', err)
       })
   }
 
   render() {
+    const { connected } = this.state
     return (
-      <div className="App">
-        <h2 onClick={this.connect} >Register Device</h2>
+      <div>
+        <h1>
+          Scale {connected ? "Online" : "Offline"}
+        </h1>
+        
+        { connected &&
+          <button onClick={this.getWeight}>Get Scale Weight</button>
+        }
+        
+        <button onClick={this.connect} >Register Device</button>
 
-        <p>
-          Scale {this.state.connected ? "Online" : "Offline"}
-        </p>
-
-        <a onClick={this.getWeight}>Get Scale Weight</a>
-
-        <pre><code>{JSON.stringify(this.state.device, null, 4)}</code></pre>
+        <h2>{this.state.grams}g</h2>
         {!navigator.usb &&
           <p>Please enable chrome::web usb</p>
         }
