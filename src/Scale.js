@@ -36,7 +36,7 @@ class Scale extends Component {
 
       navigator.usb.addEventListener("disconnect", e => {
         console.log("device lost", e);
-        this.disconnect()
+        this.disconnect();
       });
 
       this.connect = () => {
@@ -45,12 +45,12 @@ class Scale extends Component {
           .then(device => this.bindDevice(device))
           .catch(error => {
             console.error(error);
-            this.disconnect()
+            this.disconnect();
           });
       };
     }
 
-    this.getWeight  = this.getWeight.bind(this);
+    this.getWeight = this.getWeight.bind(this);
     this.stopWeight = this.stopWeight.bind(this);
     this.bindDevice = this.bindDevice.bind(this);
     this.disconnect = this.disconnect.bind(this);
@@ -118,18 +118,19 @@ class Scale extends Component {
       .then(() => this.getWeight())
       .catch(err => {
         console.error("USB Error", err);
-        this.setState({errorMsg: err})
+        this.setState({ errorMsg: err.message });
       });
   }
 
-  disconnect(){
+  disconnect() {
     this.setState({
       connected: false,
       device: null,
       shouldRead: null,
       weight: "?",
       unit: "",
-      scaleState: ""
+      scaleState: "",
+      errorMsg: ""
     });
   }
 
@@ -141,7 +142,7 @@ class Scale extends Component {
       weight,
       unit,
       scaleState,
-      error
+      errorMsg
     } = this.state;
 
     return (
@@ -150,19 +151,15 @@ class Scale extends Component {
           Scale {connected ? "Online" : "Offline"}
         </h1>
 
-        {(!navigator.usb || errorMsg) &&
+        {!navigator.usb &&
           <p>
             Please enable chrome://flags/#enable-experimental-web-platform-features
-          </p>
-        }
+          </p>}
 
-
-                {( errorMsg) &&
-                  <p>
-                    {errorMsg}
-                  </p>
-                }
-
+        {errorMsg &&
+          <p>
+            {errorMsg}
+          </p>}
 
         {connected &&
           !shouldRead &&
