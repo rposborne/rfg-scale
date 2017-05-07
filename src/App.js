@@ -49,8 +49,9 @@ class App extends Component {
 
   getWeight() {
     const { device } = this.state;
+    const {endpointNumber, packetSize} = device.configuration.interfaces[0].alternate.endpoints[0]
     let readLoop = () => {
-      device.transferIn(2, 8)
+      device.transferIn(endpointNumber, packetSize)
         .then(result => {
           let data = new Uint8Array(result.data.buffer)
           let grams = data[4] + (256 * data[5])
@@ -67,7 +68,7 @@ class App extends Component {
   bindDevice(device) {
     device.open()
       .then(() => {
-        console.log(`Connected ${device.productName} ${device.manufacturerName}`);
+        console.log(`Connected ${device.productName} ${device.manufacturerName}`, device);
         this.setState({ connected: true, device: device })
 
         if (device.configuration === null) {
