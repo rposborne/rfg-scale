@@ -1,4 +1,4 @@
-# DYMO Scale
+# DYMO Scale with WebUSB
 
 This is a proof of concept to use "webUSB" to get weight data from a DYMO M25-US
 
@@ -32,5 +32,13 @@ The DataView / Array buffer that passed into the promise of transferIn is highly
 | 3 | Scale Factor | 0 or 255
 | 4 | Raw Weight | 0-255
 | 5 | Raw Weight Multiples of 256 |  0-255
+
+## Warning on Macs
+
+In OS X USB devices that use the HID device class are opened by IOUSBHID and can not be used by in any meaningful way without writing a codeless kext or disabling IOUSBHID.
+
+# DO NOT RUN THIS LIGHTLY
+`sudo kextunload -b com.apple.driver.usb.IOUSBHostHIDDevice`
+It will disable any external USB keyboard.
 
 Massive thanks to [http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/](http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/) for a push to the right direction on how the data was being sent.
