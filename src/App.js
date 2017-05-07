@@ -5,7 +5,10 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.USB_FILTERS = [{ vendorId: 0x0922, productId: 0x8003 }]
+    this.USB_FILTERS = [
+      { vendorId: 0x0922, productId: 0x8003 },
+      { vendorId: 0x0922, productId: 0x8004 }
+    ]
 
     this.state = {
       connected: false,
