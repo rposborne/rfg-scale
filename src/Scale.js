@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import "./App.css";
-class App extends Component {
+import "./Scale.css";
+class Scale extends Component {
   constructor(props) {
     super(props);
 
     this.USB_FILTERS = [
-      { vendorId: 0x0922, productId: 0x8003 },
-      { vendorId: 0x0922, productId: 0x8004 }
+      { vendorId: 0x0922, productId: 0x8003 }, // 10lb scale
+      { vendorId: 0x0922, productId: 0x8004 } // 25lb scale
     ];
 
     this.UNIT_MODES = { 2: "g", 11: "oz" };
@@ -18,7 +18,8 @@ class App extends Component {
       shouldRead: null,
       weight: "?",
       unit: "",
-      scaleState: ""
+      scaleState: "",
+      errorMsg: null
     };
 
     if (navigator.usb) {
@@ -49,7 +50,7 @@ class App extends Component {
       };
     }
 
-    this.getWeight = this.getWeight.bind(this);
+    this.getWeight  = this.getWeight.bind(this);
     this.stopWeight = this.stopWeight.bind(this);
     this.bindDevice = this.bindDevice.bind(this);
     this.disconnect = this.disconnect.bind(this);
@@ -117,6 +118,7 @@ class App extends Component {
       .then(() => this.getWeight())
       .catch(err => {
         console.error("USB Error", err);
+        this.setState({errorMsg: err})
       });
   }
 
@@ -138,7 +140,8 @@ class App extends Component {
       shouldRead,
       weight,
       unit,
-      scaleState
+      scaleState,
+      error
     } = this.state;
 
     return (
@@ -147,10 +150,19 @@ class App extends Component {
           Scale {connected ? "Online" : "Offline"}
         </h1>
 
-        {!navigator.usb &&
+        {(!navigator.usb || errorMsg) &&
           <p>
             Please enable chrome://flags/#enable-experimental-web-platform-features
-          </p>}
+          </p>
+        }
+
+
+                {( errorMsg) &&
+                  <p>
+                    {errorMsg}
+                  </p>
+                }
+
 
         {connected &&
           !shouldRead &&
@@ -171,4 +183,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Scale;
