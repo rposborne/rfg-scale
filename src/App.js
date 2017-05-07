@@ -4,8 +4,11 @@ window.device = null;
 
 class App extends Component {
 
+
   constructor(props) {
     super(props);
+
+    this.USB_FILTERS = [{ vendorId: 0x0922, productId: 0x8003 }]
 
     this.state = {
       connected: false,
@@ -14,7 +17,7 @@ class App extends Component {
     }
 
     if (navigator.usb) {
-      navigator.usb.getDevices()
+      navigator.usb.getDevices({ filters: this.USB_FILTERS })
         .then((devices) => {
           devices.forEach(device => {
             this.bindDevice(device)
@@ -28,12 +31,11 @@ class App extends Component {
 
       navigator.usb.addEventListener('disconnect', e => {
         console.log('device lost', e);
-        e.device.close()
         this.setState({ connected: false, device: null })
       });
 
       this.connect = () => {
-        navigator.usb.requestDevice({ filters: [{ vendorId: 0x0922, productId: 0x8003 }] })
+        navigator.usb.requestDevice({ filters: this.USB_FILTERS })
           .then(device => this.bindDevice(device))
           .catch(error => {
             this.setState({ connected: false, device: null })
@@ -48,12 +50,16 @@ class App extends Component {
   getWeight() {
     const { device } = this.state;
     let readLoop = () => {
-      device.transferIn(2, 8).then(result => {
-        let data = new Uint8Array(result.data.buffer)
-        let grams = data[4] + (256 * data[5])
-        this.setState({ grams: grams })
-        readLoop();
-      });
+      device.transferIn(2, 8)
+        .then(result => {
+          let data = new Uint8Array(result.data.buffer)
+          let grams = data[4] + (256 * data[5])
+          this.setState({ grams: grams })
+          readLoop();
+        })
+        .catch((err) => {
+          console.error('USB Read Error', err)
+        })
     }
     readLoop();
   }
@@ -81,16 +87,16 @@ class App extends Component {
         <h1>
           Scale {connected ? "Online" : "Offline"}
         </h1>
-        
-        { connected &&
+
+        {connected &&
           <button onClick={this.getWeight}>Get Scale Weight</button>
         }
-        
+
         <button onClick={this.connect} >Register Device</button>
 
         <h2>{this.state.grams}g</h2>
         {!navigator.usb &&
-          <p>Please enable chrome::web usb</p>
+          <p>Please enable chrome://flags/#enable-experimental-web-platform-features</p>
         }
       </div>
     );
