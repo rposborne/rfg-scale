@@ -66,15 +66,23 @@ class App extends Component {
         .transferIn(endpointNumber, packetSize)
         .then(result => {
           let data = new Uint8Array(result.data.buffer);
-          let weight = (data[4] + 256 * data[5]);
-          const unitMode = data[2];
-          const scaleState = data[1];
-          console.log("data", data);
+
+
+          let weight = data[4] + 256 * data[5];
+
+          const unit = this.UNIT_MODES[data[2]];
+
+          if (unit === "oz") {
+            // Use Math.pow to avoid floating point math.
+            weight /= Math.pow(10, 1);
+          }
+
+          const scaleState = this.SCALE_STATES[data[1]];
 
           this.setState({
             weight: weight,
-            unit: this.UNIT_MODES[unitMode],
-            scaleState: this.SCALE_STATES[scaleState]
+            unit: unit,
+            scaleState: scaleState
           });
 
           if (this.state.shouldRead) {
