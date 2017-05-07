@@ -115,6 +115,7 @@ class App extends Component {
         }
       })
       .then(() => device.claimInterface(0))
+      .then(() => this.getWeight())
       .catch(err => {
         console.error("USB Error", err);
       });
