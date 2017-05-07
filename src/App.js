@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import './App.css'
 class App extends Component {
 
   constructor(props) {
@@ -92,7 +92,7 @@ class App extends Component {
   render() {
     const { connected, shouldRead, grams } = this.state
     return (
-      <div>
+      <main>
         <h1>
           Scale {connected ? "Online" : "Offline"}
         </h1>
@@ -112,7 +112,7 @@ class App extends Component {
         <button onClick={this.connect}>Register Device</button>
 
         <h2>{grams}g</h2>
-      </div>
+      </main>
     );
   }
 }
