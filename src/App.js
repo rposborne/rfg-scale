@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import './App.css';
-window.device = null;
 
 class App extends Component {
-
 
   constructor(props) {
     super(props);
@@ -45,16 +42,16 @@ class App extends Component {
     }
 
     this.getWeight = this.getWeight.bind(this);
-    this.bindDevice = this.bindDevice.bind(this);
     this.stopWeight = this.stopWeight.bind(this);
+    this.bindDevice = this.bindDevice.bind(this);
   }
 
   getWeight() {
-    this.setState({shouldRead: true})
+    this.setState({ shouldRead: true })
     const { device } = this.state;
-    const {endpointNumber, packetSize} = device.configuration.interfaces[0].alternate.endpoints[0]
+    const { endpointNumber, packetSize } = device.configuration.interfaces[0].alternate.endpoints[0]
     let readLoop = () => {
-      
+
       device.transferIn(endpointNumber, packetSize)
         .then(result => {
           let data = new Uint8Array(result.data.buffer)
@@ -72,8 +69,8 @@ class App extends Component {
     readLoop();
   }
 
-  stopWeight(){
-    this.setState({shouldRead: false});
+  stopWeight() {
+    this.setState({ shouldRead: false });
   }
 
   bindDevice(device) {
@@ -93,12 +90,16 @@ class App extends Component {
   }
 
   render() {
-    const { connected, shouldRead } = this.state
+    const { connected, shouldRead, grams } = this.state
     return (
       <div>
         <h1>
           Scale {connected ? "Online" : "Offline"}
         </h1>
+
+        {!navigator.usb &&
+          <p>Please enable chrome://flags/#enable-experimental-web-platform-features</p>
+        }
 
         {connected && !shouldRead &&
           <button onClick={this.getWeight}>Get Scale Weight</button>
@@ -108,12 +109,9 @@ class App extends Component {
           <button onClick={this.stopWeight}>Hold</button>
         }
 
-        <button onClick={this.connect} >Register Device</button>
+        <button onClick={this.connect}>Register Device</button>
 
-        <h2>{this.state.grams}g</h2>
-        {!navigator.usb &&
-          <p>Please enable chrome://flags/#enable-experimental-web-platform-features</p>
-        }
+        <h2>{grams}g</h2>
       </div>
     );
   }
