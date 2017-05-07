@@ -67,7 +67,6 @@ class App extends Component {
         .then(result => {
           let data = new Uint8Array(result.data.buffer);
 
-
           let weight = data[4] + 256 * data[5];
 
           const unit = this.UNIT_MODES[data[2]];

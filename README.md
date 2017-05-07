@@ -1,25 +1,36 @@
-# Dyno Scale
+# DYMO Scale
 
-This is a proof of concept to use webusb to acquire scale data from a Dyno M25-US
+This is a proof of concept to use "webUSB" to get weight data from a DYMO M25-US
 
 ## Requirements
 
-WebUsb requires some prework before it can be used. 
+WebUsb requires some setup before it can be used.
 
-1. Enable expiermental platform features chrome://flags/#enable-experimental-web-platform-features
+1. Enable experimental platform features chrome://flags/#enable-experimental-web-platform-features
 2. Must be on localhost or https://
 
-## Things Learned
+## Lessons
 
-There are many hoops to jump through before you can stat talking to the usb device in question. Also... macs don't work.
+There are many hoops to jump through before you can start talking to the USB device in question.
 
 1. Open connection to the device with `device.open()`
 2. Set a default configuration.
-3. claimInterface
+3. `device.claimInterface(interfaceNumber)`
 4. speak to the usb device / read from the device with `device.transferOut` and `device.transferIn(endpointNumber, maxBytesPerMessage)`
 
-This behaves like a file and will read the n number of bytes from the pointer.  We solved this with recursing to the end of the buffer.
+This behaves like a file and will read the N number of bytes from the pointer.  We solved getting the most recent data with recursing to the end of the buffer.
 
-The DataView / Array buffer that is passed by the promise of transferIn is highly dependent on your device.  For the M25 we use an Uint8Array,  the data is a 6 digit array where indexs 4, 5 are used to calculate the weight of the scale.
+The DataView / Array buffer that passed into the promise of transferIn is highly dependent on your device.  For the DYMO M25 we use an Uint8Array,  the data is a 6 digit array where index 4 and 5 added together calculate the weight on the scale.
+
+`Uint8Array(6) [3, 2, 11, 255, 0, 0]`
+
+| Index  | What is it?  | Values|
+| ------------- | ------------- |
+| 0  | ? | 3 |
+| 1  | Scale State | Zeroed (2), Positive (4), Negative(5)  |
+| 2  | Unit Mode | Grams (2), Ounces (11)  |
+| 3  | Scale Factor | 0 or 255
+| 4  | Raw Weight  | 0-255
+| 5  | Raw Weight Multiples of 256  |  0-255
 
 Massive thanks to [http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/](http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/) for a push to the right direction on how the data was being sent.
