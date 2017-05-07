@@ -24,13 +24,13 @@ The DataView / Array buffer that passed into the promise of transferIn is highly
 
 `Uint8Array(6) [3, 2, 11, 255, 0, 0]`
 
-| Index  | What is it?  | Values|
-| ------------- | ------------- |
-| 0  | ? | 3 |
-| 1  | Scale State | Zeroed (2), Positive (4), Negative(5)  |
-| 2  | Unit Mode | Grams (2), Ounces (11)  |
-| 3  | Scale Factor | 0 or 255
-| 4  | Raw Weight  | 0-255
-| 5  | Raw Weight Multiples of 256  |  0-255
+| Index | What is it? | Values |
+| ------------- | ------------- | ------------- |
+| 0 | ? | 3 |
+| 1 | Scale State | Zeroed (2), Positive (4), Negative(5) |
+| 2 | Unit Mode | Grams (2), Ounces (11) |
+| 3 | Scale Factor | 0 or 255
+| 4 | Raw Weight | 0-255
+| 5 | Raw Weight Multiples of 256 |  0-255
 
 Massive thanks to [http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/](http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/) for a push to the right direction on how the data was being sent.
