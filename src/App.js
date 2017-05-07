@@ -133,7 +133,15 @@ class App extends Component {
   }
 
   render() {
-    const { connected, shouldRead, weight, unit, scaleState } = this.state;
+    const {
+      device,
+      connected,
+      shouldRead,
+      weight,
+      unit,
+      scaleState
+    } = this.state;
+
     return (
       <main>
         <h1>
@@ -147,11 +155,11 @@ class App extends Component {
 
         {connected &&
           !shouldRead &&
-          <button onClick={this.getWeight}>Get Scale Weight</button>}
+          <button onClick={this.getWeight}>▶</button>}
 
-        {shouldRead && <button onClick={this.stopWeight}>Hold</button>}
+        {shouldRead && <button onClick={this.stopWeight}>⏸</button>}
 
-        <button onClick={this.connect}>Register Device</button>
+        {!device && <button onClick={this.connect}>Register Device</button>}
 
         {connected &&
           <span className="scale">
