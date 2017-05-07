@@ -16,9 +16,9 @@ class App extends Component {
       connected: false,
       device: null,
       shouldRead: null,
-      weight: 0,
-      unit: "g",
-      scaleState: ''
+      weight: "?",
+      unit: "",
+      scaleState: ""
     };
 
     if (navigator.usb) {
@@ -35,7 +35,7 @@ class App extends Component {
 
       navigator.usb.addEventListener("disconnect", e => {
         console.log("device lost", e);
-        this.setState({ connected: false, device: null });
+        this.disconnect()
       });
 
       this.connect = () => {
@@ -44,7 +44,7 @@ class App extends Component {
           .then(device => this.bindDevice(device))
           .catch(error => {
             console.error(error);
-            this.setState({ connected: false, device: null });
+            this.disconnect()
           });
       };
     }
@@ -52,6 +52,7 @@ class App extends Component {
     this.getWeight = this.getWeight.bind(this);
     this.stopWeight = this.stopWeight.bind(this);
     this.bindDevice = this.bindDevice.bind(this);
+    this.disconnect = this.disconnect.bind(this);
   }
 
   getWeight() {
@@ -109,6 +110,17 @@ class App extends Component {
       .catch(err => {
         console.error("USB Error", err);
       });
+  }
+
+  disconnect(){
+    this.setState({
+      connected: false,
+      device: null,
+      shouldRead: null,
+      weight: "?",
+      unit: "",
+      scaleState: ""
+    });
   }
 
   render() {
