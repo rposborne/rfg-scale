@@ -132,7 +132,12 @@ class App extends Component {
 
         <button onClick={this.connect}>Register Device</button>
 
-        <h2>{scaleState}{weight}{unit}</h2>
+        {connected &&
+          <span className="scale">
+            <small>{scaleState}</small>
+            {weight}
+            <small>{unit}</small>
+          </span>}
       </main>
     );
   }
