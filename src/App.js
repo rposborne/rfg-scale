@@ -13,6 +13,7 @@ class App extends Component {
     this.state = {
       connected: false,
       device: null,
+      shouldRead: null,
       grams: 0
     }
 
@@ -45,24 +46,34 @@ class App extends Component {
 
     this.getWeight = this.getWeight.bind(this);
     this.bindDevice = this.bindDevice.bind(this);
+    this.stopWeight = this.stopWeight.bind(this);
   }
 
   getWeight() {
+    this.setState({shouldRead: true})
     const { device } = this.state;
     const {endpointNumber, packetSize} = device.configuration.interfaces[0].alternate.endpoints[0]
     let readLoop = () => {
+      
       device.transferIn(endpointNumber, packetSize)
         .then(result => {
           let data = new Uint8Array(result.data.buffer)
           let grams = data[4] + (256 * data[5])
           this.setState({ grams: grams })
-          readLoop();
+
+          if (this.state.shouldRead) {
+            readLoop();
+          }
         })
         .catch((err) => {
           console.error('USB Read Error', err)
         })
     }
     readLoop();
+  }
+
+  stopWeight(){
+    this.setState({shouldRead: false});
   }
 
   bindDevice(device) {
@@ -82,15 +93,19 @@ class App extends Component {
   }
 
   render() {
-    const { connected } = this.state
+    const { connected, shouldRead } = this.state
     return (
       <div>
         <h1>
           Scale {connected ? "Online" : "Offline"}
         </h1>
 
-        {connected &&
+        {connected && !shouldRead &&
           <button onClick={this.getWeight}>Get Scale Weight</button>
+        }
+
+        {shouldRead &&
+          <button onClick={this.stopWeight}>Hold</button>
         }
 
         <button onClick={this.connect} >Register Device</button>
