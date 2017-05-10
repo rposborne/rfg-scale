@@ -41,4 +41,7 @@ In OS X USB devices that use the HID device class are opened by IOUSBHID and can
 `sudo kextunload -b com.apple.driver.usb.IOUSBHostHIDDevice`
 It will disable any external USB keyboard.
 
+`sudo kextload -b com.apple.driver.usb.IOUSBHostHIDDevice`
+Will re-enable your external USB keyboard and disable the scale.
+
 Massive thanks to [http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/](http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/) for a push to the right direction on how the data was being sent.
