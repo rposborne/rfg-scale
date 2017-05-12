@@ -26,7 +26,7 @@ The DataView / Array buffer that passed into the promise of transferIn is highly
 
 | Index | What is it? | Values |
 | ------------- | ------------- | ------------- |
-| 0 | ? | 3 |
+| 0 | Scale Battery Level? | 3 | < If you observe this drop note the battery level and open an issue.
 | 1 | Scale State | Zeroed (2), Positive (4), Negative(5) |
 | 2 | Unit Mode | Grams (2), Ounces (11) |
 | 3 | Scale Factor | 0 or 255
@@ -37,11 +37,13 @@ The DataView / Array buffer that passed into the promise of transferIn is highly
 
 In OS X USB devices that use the HID device class are opened by IOUSBHID and can not be used by in any meaningful way without writing a codeless kext or disabling IOUSBHID.
 
-# DO NOT RUN THIS LIGHTLY
+### Disabling HID kext for development
 `sudo kextunload -b com.apple.driver.usb.IOUSBHostHIDDevice`
 It will disable any external USB keyboard.
 
 `sudo kextload -b com.apple.driver.usb.IOUSBHostHIDDevice`
 Will re-enable your external USB keyboard and disable the scale.
+
+another option is to reboot your machine.
 
 Massive thanks to [http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/](http://steventsnyder.com/reading-a-dymo-usb-scale-using-python/) for a push to the right direction on how the data was being sent.
